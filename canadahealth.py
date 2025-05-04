@@ -62,7 +62,7 @@ st.markdown(conatiner_style, unsafe_allow_html=True)
 
 # @st.cache_data(show_spinner="Please wait....")
 # def load_data():
-sidebar_option = st.sidebar.radio("Select what you want:", ["Data Analysis", "Hospital Finder"])
+sidebar_option = st.sidebar.radio("Select what you want:", ["Hospital Finder", "Data Analysis"])
 df = pd.read_excel("hospitaldata.xlsx", engine='openpyxl')
 df1 = df.fillna(0) #unknown is the value here
 df2 = df1.drop(columns=['index', 'unit', 'source_format_str_address', 'CSDuid', 'Pruid'])
