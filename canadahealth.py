@@ -106,6 +106,7 @@ if sidebar_option == "Hospital Finder":
 
         postal_code = st.text_input("Enter your Postal Code (e.g., V8X 1W3):")
         
+
                 
         if postal_code:
             geolocator = Nominatim(user_agent="health_locator", timeout=10)
@@ -120,10 +121,8 @@ if sidebar_option == "Hospital Finder":
             else:
                 st.warning("Geocoding failed. Trying to find facilities using partial postal code (FSA)...")
 
-                # Extract FSA (first 3 characters)
                 fsa = postal_code.strip().upper().replace(" ", "")[:3]
 
-                # Match dataset postal codes that start with this FSA
                 df3['Clean Postal'] = df3['Postal Code'].astype(str).str.replace(" ", "").str.upper().str.strip()
                 fsa_matches = df3[df3['Clean Postal'].str.startswith(fsa)]
 
@@ -137,7 +136,6 @@ if sidebar_option == "Hospital Finder":
                     ]
                     st.dataframe(nearby_facilities)
 
-                    # Optional: display a rough map with these facilities
                     avg_lat = nearby_facilities['Latitude'].mean()
                     avg_lon = nearby_facilities['Longitude'].mean()
                     m = folium.Map(location=(avg_lat, avg_lon), zoom_start=12)
@@ -153,7 +151,6 @@ if sidebar_option == "Hospital Finder":
                 else:
                     st.error(f"No facilities found with postal codes starting with '{fsa}'. Please try a different postal code.")
                     st.stop()
-            # If geocoding succeeded earlier, continue to normal radius search:
             if user_coords:
                 def is_in_radius(row):
                     facility_coords = (row['Latitude'], row['Longitude'])
