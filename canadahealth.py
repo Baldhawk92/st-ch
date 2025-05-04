@@ -60,14 +60,16 @@ st.markdown(conatiner_style, unsafe_allow_html=True)
 
 #-------The logo and the title-----------------
 
-# @st.cache_data(show_spinner="Please wait....")
-# def load_data():
 sidebar_option = st.sidebar.radio("Select what you want:", ["Hospital Finder", "Data Analysis"])
-df = pd.read_excel("hospitaldata.xlsx", engine='openpyxl')
-df1 = df.fillna(0) #unknown is the value here
-df2 = df1.drop(columns=['index', 'unit', 'source_format_str_address', 'CSDuid', 'Pruid'])
-df3 = df2.rename(columns={'facility_name': 'Facility Name', 'source_facility_type': 'Category Type', 'odhf_facility_type': 'Facility Type', 'provider': 'Facility Provider', 'street_no': 'Street Number', 'street_name': 'Street Name', 'postal_code': 'Postal Code', 'city': 'City', 'province': 'Province', 'CSDname': 'Sub City', 'latitude': 'Latitude', 'longitude': 'Longitude'})
+@st.cache_data(show_spinner="Please wait....")
+def load_data():
+    df = pd.read_excel("hospitaldata.xlsx", engine='openpyxl')
+    df1 = df.fillna(0) #unknown is the value here
+    df2 = df1.drop(columns=['index', 'unit', 'source_format_str_address', 'CSDuid', 'Pruid'])
+    df3 = df2.rename(columns={'facility_name': 'Facility Name', 'source_facility_type': 'Category Type', 'odhf_facility_type': 'Facility Type', 'provider': 'Facility Provider', 'street_no': 'Street Number', 'street_name': 'Street Name', 'postal_code': 'Postal Code', 'city': 'City', 'province': 'Province', 'CSDname': 'Sub City', 'latitude': 'Latitude', 'longitude': 'Longitude'})
 
+    return df3
+df3 = load_data()
 # if sidebar_option == "Data Analysis":
 
 #     selected_option = st.radio("Select an option:", ["Type of Facility", "Province or City", "Provider", "Source"], index=None)
@@ -182,3 +184,15 @@ if sidebar_option == "Hospital Finder":
                     st.warning(f"No facilities found within {radius_km} km.")
     except Exception as e:
         st.error(f"Error occurred: {e}")
+            
+                
+
+  
+
+
+
+
+    
+
+
+
