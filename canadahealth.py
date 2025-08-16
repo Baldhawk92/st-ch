@@ -112,6 +112,8 @@ if sidebar_option == "Hospital Finder":
         postal_code = st.text_input("Enter your Postal Code (e.g., V8X 1W3):")
         
         geolocator = geolocate()
+
+        
                 
         if postal_code:
             location = geolocator.geocode(postal_code)
@@ -194,7 +196,6 @@ if sidebar_option == "Hospital Finder":
 
 
     
-
 
 
 
