@@ -100,16 +100,20 @@ df3 = load_data()
 #     st.subheader("Facility Type Distribution by Province:")
 #     st.dataframe(table, use_container_width=True)
 
+@st.cache_resource
+def geolocate():
+    geolocator = Nominatim(user_agent="health_locator", timeout=10)
+    return geolocator
+
 if sidebar_option == "Hospital Finder":
     try:
         st.title("Healthcare Facility Proximity Finder (Canada)")
 
         postal_code = st.text_input("Enter your Postal Code (e.g., V8X 1W3):")
         
-
+        geolocator = geolocate()
                 
         if postal_code:
-            geolocator = Nominatim(user_agent="health_locator", timeout=10)
             location = geolocator.geocode(postal_code)
 
             user_coords = None
@@ -190,6 +194,7 @@ if sidebar_option == "Hospital Finder":
 
 
     
+
 
 
 
