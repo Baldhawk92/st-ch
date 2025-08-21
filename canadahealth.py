@@ -1,7 +1,6 @@
 # ---------Imports----------
 import pandas as pd
 import streamlit as st
-from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import folium
 from streamlit_folium import st_folium
