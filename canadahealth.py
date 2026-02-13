@@ -2,14 +2,16 @@
 import pandas as pd
 import streamlit as st
 from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
 import folium
 from streamlit_folium import st_folium
-import googlemaps
+import time
 # ---------Imports----------
 
 
 # ------Streamlit----------
-st.set_page_config(page_title="Canada Health", page_icon="", layout="wide")
+st.set_page_config(page_title="Canada Health", page_icon="🏥", layout="wide")
 # ------Streamlit----------
 
 
@@ -72,14 +74,15 @@ def load_data():
 
 @st.cache_resource
 def get_geolocator():
-    gmaps_api_key = st.secrets["api_keys"]["gmaps"]
-    gmaps = googlemaps.Client(key=gmaps_api_key)
-    return gmaps
+    # Initialize Nominatim geocoder with a custom user agent
+    geolocator = Nominatim(user_agent="canada_health_locator_v1")
+    # Add rate limiting to be respectful to the free service (1 request per second)
+    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+    return geolocator, geocode
 # ------------------------------------------------------------------------------------------------------------------------------------------------------
 
  
 df = load_data()
-# geolocator = get_geolocator()
 # ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -90,16 +93,20 @@ if sidebar_options == 'Search Facility':
 
 
     if postal_code:
-        gmaps = get_geolocator()
+        geolocator, geocode = get_geolocator()
         
-        location = gmaps.geocode(postal_code + ", Canada")
+        try:
+            # Geocode the postal code with Canada specified
+            location = geocode(f"{postal_code}, Canada")
+        except Exception as e:
+            st.error(f"Error geocoding postal code: {e}")
+            location = None
     # ------------------------------------------------------------------------------------------------------------------------------------------------------
         
 
         
         if location:
-            location = location[0]['geometry']['location']
-            user_coords = (location['lat'], location['lng'])
+            user_coords = (location.latitude, location.longitude)
             
             facility_distance = st.slider("How far do you want to look for? (in Km)", 1, 10)
     # ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,8 +117,8 @@ if sidebar_options == 'Search Facility':
                 distance = geodesic(user_coords, facility_coords).km
                 return distance <= facility_distance
         
-            df = df[df.apply(is_in_radius, axis=1)]
-            # st.dataframe(df)
+            filtered_df = df[df.apply(is_in_radius, axis=1)]
+            # st.dataframe(filtered_df)
     # ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -123,8 +130,8 @@ if sidebar_options == 'Search Facility':
             ).add_to(m)
 
 
-            for _, row in df.iterrows():
-                func = f'<h4>{row['Facility Name']}</h4><span style="font-size: 14px;">Service Type: <b>{row['Service Type']}</b></span><br /><span style="font-size: 14px;">Provider Name: <b>{row['Provider Name']}</b></span><br /><span style="font-size: 14px;">Full Address: <b>{row['Full Address']}</b></span>'
+            for _, row in filtered_df.iterrows():
+                func = f'<h4>{row["Facility Name"]}</h4><span style="font-size: 14px;">Service Type: <b>{row["Service Type"]}</b></span><br /><span style="font-size: 14px;">Provider Name: <b>{row["Provider Name"]}</b></span><br /><span style="font-size: 14px;">Full Address: <b>{row["Full Address"]}</b></span>'
                 popup = folium.Popup(func, max_width=350)
                 folium.Marker(
                     location = (row['Latitude'], row['Longitude']),
@@ -135,14 +142,10 @@ if sidebar_options == 'Search Facility':
 
             st_folium(m, width=700, height=400, returned_objects=[])
     # ------------------------------------------------------------------------------------------------------------------------------------------------------
+        else:
+            st.error("Could not find location for the entered postal code. Please check and try again.")
             
   
     else:
-        st.error("Please enter a postal code")
+        st.warning("Please enter a postal code")
 # --------Main code------------
-
-
-
-
-
-
