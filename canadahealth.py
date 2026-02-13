@@ -11,7 +11,7 @@ import time
 
 
 # ------Streamlit----------
-st.set_page_config(page_title="Canada Health", page_icon="🏥", layout="wide")
+st.set_page_config(page_title="Canada Health", layout="wide")
 # ------Streamlit----------
 
 
@@ -88,7 +88,7 @@ df = load_data()
 
 if sidebar_options == 'Search Facility':
     st.title("Healthcare Facility Locator for Canadian Citizens")
-    postal_code = st.text_input("Enter your postal code (e.g. V8X 3R5)")
+    postal_code = st.text_input("Please enter your address or location name")
     # ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -147,5 +147,5 @@ if sidebar_options == 'Search Facility':
             
   
     else:
-        st.warning("Please enter a postal code")
+        st.warning("Please enter your address or location name")
 # --------Main code------------
